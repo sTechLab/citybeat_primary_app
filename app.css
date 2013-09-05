@@ -1,0 +1,22 @@
+@import url(http://fonts.googleapis.com/css?family=Crete+Round|Pontano+Sans);
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+  min-width: 650px;
+
+  font-family: 'Pontano Sans', sans-serif;
+
+  background: #1d1d1d;
+}
+
+/* Map */
+#map { 
+  position:absolute;
+  top: 50px;
+  bottom: 0;
+  width:100%; 
+}
+/* End Map */
