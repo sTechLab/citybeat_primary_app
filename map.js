@@ -26,7 +26,7 @@ var fetch_data = function(cb) {
   var pulse_data = [];
   var event_data = [];
 
-  d3.json('data.json', function(error, json) {
+  d3.json('data2.json', function(error, json) {
     if(error) {
       console.log(error);
       cb(error);
@@ -53,20 +53,20 @@ var fetch_data = function(cb) {
 
       /* Event */
       var evnt = {};
-      evnt.id = eve._id;
-      evnt.keywords = ["Lorem", "Ipsum", "Filler"];
-      evnt.photos = [];
-      for(var j = 0; (j < eve.images.length) && (j < 5); j++) {
-        var photo = eve.images[j];
-        var caption = '';
-        if(photo.caption) {
-          caption = photo.caption.text;
-          //Remove emoji
-          caption = caption.replace(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '');
-        }
-        evnt.photos.push({img: photo.images.standard_resolution.url, 
-            caption: caption});
-      }
+      // evnt.id = eve._id;
+      // evnt.keywords = ["Lorem", "Ipsum", "Filler"];
+      // evnt.photos = [];
+      // for(var j = 0; (j < eve.images.length) && (j < 5); j++) {
+      //   var photo = eve.images[j];
+      //   var caption = '';
+      //   if(photo.caption) {
+      //     caption = photo.caption.text;
+      //     //Remove emoji
+      //     caption = caption.replace(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '');
+      //   }
+      //   evnt.photos.push({img: photo.images.standard_resolution.url, 
+      //       caption: caption});
+      // }
 
       /* TEMP */
 
@@ -93,12 +93,10 @@ var fetch_data = function(cb) {
 // var pulseLayer = PulseLayer(); 
 
 /* MAP */
-  // var layer = mapbox.layer().id('raziku.map-6nox10c2');
-
   var map = L.mapbox.map('map', 'raziku.map-6nox10c2').setView([40.75275880391166,-73.97139047965452],13);
   window.map = map;
-  // map.center({ lat: 40.75275880391166, lon: -73.97139047965452 });
-  // map.zoom(13, true);
+
+  var geoJson = [];
 
   fetch_data(function(error, pulse_data, event_data) {
     if(error) { 
@@ -109,110 +107,50 @@ var fetch_data = function(cb) {
       return;
     }
 
-    // console.log(pulse_data)
-
-    // pulseLayer.data(pulse_data);
-    // // pulseLayer.animate(earthquake);
-    // map.addLayer(pulseLayer);
-    // map.extent(pulseLayer.extent());
-
-  /* EVENT LOOP */
-    // var events = new Event();
-
-    // function whichTransitionEvent(){
-    //   var t;
-    //   var el = document.createElement('fakeelement');
-    //   var transitions = {
-    //     'transition':'transitionend',
-    //     'OTransition':'oTransitionEnd',
-    //     'MozTransition':'transitionend',
-    //     'WebkitTransition':'webkitTransitionEnd'
-    //   }
-
-    //   for(t in transitions){
-    //     if( el.style[t] !== undefined ){
-    //       return transitions[t];
-    //     }
-    //   }
-    // }
-
-    // var transitionEnd = whichTransitionEvent();
-
     function event_loop(event_data, event_idx) {
 
-      console.log(event_data)
+      event_data.forEach(function(evt){
+        console.log(evt)
+        console.log(evt.lng*2)
+        console.log(evt.lat*2)
 
-      // var ev = event_data[event_idx];
+        var geoPoint = {
+          'type': 'Feature',
+          'geometry': {
+              'type': 'Point',
+              // coordinates here are in longitude, latitude order because
+              // x, y is the standard for GeoJSON and many formats
+              'coordinates': [evt.lng*2,evt.lat*2]
+          },
+          'properties': {        
+            'title': "blue",
+            'icon': {
+                  'iconUrl': "/blue_dot.jpg",
+                  'iconSize': [5, 5]
+              }
+          }
+        };
 
-      // //Activate new active pulse
-      // var new_pulse = pulseLayer.findPulseByID(ev.id);
-      // new_pulse.classed('active-pulse', true).classed('inactive-pulse', false);
+        geoJson.push(geoPoint);
 
-
-      // //map.centerzoom({lat: ev.lat, lon: ev.lng}, 12, true);
-
-      // //Wait for map zoom
-      // //setTimeout(function() {
-      //   map.centerzoom({lat: ev.lat + 0.004, lon: ev.lng}, 15, true);
-
-      //   events.loadNewData(ev);
-
-      //   d3.select('#event-window').classed('zoom', false);
-
-      //   events.animate();
-        
-      //   //Deactivates event and runs next animation
-      //   setTimeout(function() { 
-      //     //Deactivate old pulse
-      //     pulseLayer.findPulseByID(ev.id)
-      //       .classed('active-pulse', false).classed('inactive-pulse', true);
-
-      //     events.stopAnimation();
-
-      //     d3.select('#event-window').classed('zoom', true);
-
-      //     d3.select('#event-window').on(transitionEnd, function() {
-      //       if(d3.select(this).classed('zoom')) {
-      //         event_idx = (event_idx+1) % event_data.length;
-      //         event_loop(event_data, event_idx);
-
-      //         pulseLayer.findPulseByID(ev.id)
-      //           .classed('active-pulse', false).classed('inactive-pulse', true);
-
-      //         //Cleanup leaks
-      //         ev = null;
-      //         new_pulse = null;
-      //       }
-      //     });
-
-
-      //   }, 14000);
-      // //}, 2000);
-
-    }
-
-    L.mapbox.markerLayer({
-    // this feature is in the GeoJSON format: see geojson.org
-    // for the full specification
-    type: 'Feature',
-    geometry: {
-        type: 'Point',
-        // coordinates here are in longitude, latitude order because
-        // x, y is the standard for GeoJSON and many formats
-        coordinates: [-73.97139047965452,40.75275880391166]
-    },
-    properties: {
-        title: 'A Single Marker',
-        description: 'Just one of me',
-        'marker-size': 'small',
-        'marker-color': '#f0a'
-    }
-  }).addTo(map);
+        console.log("this is the geo json")
+        console.log(geoJson);
+      });
     
+
+      map.markerLayer.on('layeradd', function(e) {
+        var marker = e.layer,
+        feature = marker.feature;
+
+        marker.setIcon(L.icon(feature.properties.icon));
+      });
+
+      map.markerLayer.setGeoJSON(geoJson);
+  }
+
     d3.select('#event-window').classed('zoom', true);
     event_loop(event_data, 0);
 
-  /* EVENT */
   });
 /* MAP */
 
