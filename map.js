@@ -1,3 +1,24 @@
+/* Set up defaults */
+var start_scale = 1;
+var pulse_rate = 2000;
+var scale_factor = 120;
+
+/* Figure out what the data pulse rate is based on deviation */
+var data_pulse_prop = function(deviation, scale_function, pulse_function) {
+  var props = {"start_scale": start_scale, "pulse_rate": pulse_rate,
+               "pulse_time": 1};
+
+  scale_function = function(start, dev) {
+    //return start + Math.pow(Math.E, dev) * 20;
+    return start + (Math.pow(2, dev) - 1) * scale_factor;
+  };
+
+  props.max_scale = scale_function(start_scale, deviation);
+
+  props.pulse_time /= deviation;
+  
+  return props;
+};
 
 /* Fetch Data, create geo features */
 var fetch_data = function(cb) {
@@ -5,18 +26,22 @@ var fetch_data = function(cb) {
   var pulse_data = [];
   var event_data = [];
 
-  d3.json('http://ec2-23-22-67-45.compute-1.amazonaws.com/citybeat-backend/getAllEvents', function(error, json) {
+  d3.json('data.json', function(error, json) {
     if(error) {
       console.log(error);
       cb(error);
       return;
     }
 
+      console.log(json)
+
+
     for(var i = 0; i < json.length; i++) {
       var eve = json[i];
+      console.log(eve)
 
-      var lat = (eve.region.max_lat + eve.region.min_lat)/2;
-      var lng = (eve.region.max_lng + eve.region.min_lng)/2;
+      var lat = (eve.location.latitude)/2;
+      var lng = (eve.location.longitude)/2;
 
       /* Pulse */
       var deviation = eve.urgency/100;
@@ -31,8 +56,8 @@ var fetch_data = function(cb) {
       evnt.id = eve._id;
       evnt.keywords = ["Lorem", "Ipsum", "Filler"];
       evnt.photos = [];
-      for(var j = 0; (j < eve.photos.length) && (j < 5); j++) {
-        var photo = eve.photos[j];
+      for(var j = 0; (j < eve.images.length) && (j < 5); j++) {
+        var photo = eve.images[j];
         var caption = '';
         if(photo.caption) {
           caption = photo.caption.text;
@@ -42,16 +67,15 @@ var fetch_data = function(cb) {
         evnt.photos.push({img: photo.images.standard_resolution.url, 
             caption: caption});
       }
-      evnt.tweets = [];
-      /* TEMP until we get tweets */
-      evnt.tweets.push({text:"Lorem ipsum. Filler tweet. Long tweet. Short response.", author: "@RiverTam"});
-      evnt.tweets.push({text:"Fillers Fillers Fillers everywhere.", author: "@MalReynolds"});
+
       /* TEMP */
 
-      evnt.stats = eve.stats;
+      // evnt.stats = eve.stats;
 
-      evnt.stats.tweets = 38;
-      evnt.stats.checkins = 56;
+      // console.log(eve)
+      // console.log(evnt)
+      // evnt.stats.tweets = 38;
+      // evnt.stats.checkins = 56;
 
       evnt.lng = lng;
       evnt.lat = lat;
@@ -65,6 +89,8 @@ var fetch_data = function(cb) {
 
 };
 
+/* Map Initiating Pulse Layer */
+// var pulseLayer = PulseLayer(); 
 
 /* MAP */
   var layer = mapbox.layer().id('raziku.map-6nox10c2');
@@ -84,80 +110,85 @@ var fetch_data = function(cb) {
       return;
     }
 
-    pulseLayer.data(pulse_data);
-    pulseLayer.animate(earthquake);
-    map.addLayer(pulseLayer);
-    map.extent(pulseLayer.extent());
+    // console.log(pulse_data)
+
+    // pulseLayer.data(pulse_data);
+    // // pulseLayer.animate(earthquake);
+    // map.addLayer(pulseLayer);
+    // map.extent(pulseLayer.extent());
 
   /* EVENT LOOP */
-    var events = new Event();
+    // var events = new Event();
 
-    function whichTransitionEvent(){
-      var t;
-      var el = document.createElement('fakeelement');
-      var transitions = {
-        'transition':'transitionend',
-        'OTransition':'oTransitionEnd',
-        'MozTransition':'transitionend',
-        'WebkitTransition':'webkitTransitionEnd'
-      }
+    // function whichTransitionEvent(){
+    //   var t;
+    //   var el = document.createElement('fakeelement');
+    //   var transitions = {
+    //     'transition':'transitionend',
+    //     'OTransition':'oTransitionEnd',
+    //     'MozTransition':'transitionend',
+    //     'WebkitTransition':'webkitTransitionEnd'
+    //   }
 
-      for(t in transitions){
-        if( el.style[t] !== undefined ){
-          return transitions[t];
-        }
-      }
-    }
+    //   for(t in transitions){
+    //     if( el.style[t] !== undefined ){
+    //       return transitions[t];
+    //     }
+    //   }
+    // }
 
-    var transitionEnd = whichTransitionEvent();
+    // var transitionEnd = whichTransitionEvent();
 
     function event_loop(event_data, event_idx) {
-      var ev = event_data[event_idx];
 
-      //Activate new active pulse
-      var new_pulse = pulseLayer.findPulseByID(ev.id);
-      new_pulse.classed('active-pulse', true).classed('inactive-pulse', false);
+      console.log(event_data)
+
+      // var ev = event_data[event_idx];
+
+      // //Activate new active pulse
+      // var new_pulse = pulseLayer.findPulseByID(ev.id);
+      // new_pulse.classed('active-pulse', true).classed('inactive-pulse', false);
 
 
-      //map.centerzoom({lat: ev.lat, lon: ev.lng}, 12, true);
+      // //map.centerzoom({lat: ev.lat, lon: ev.lng}, 12, true);
 
-      //Wait for map zoom
-      //setTimeout(function() {
-        map.centerzoom({lat: ev.lat + 0.004, lon: ev.lng}, 15, true);
+      // //Wait for map zoom
+      // //setTimeout(function() {
+      //   map.centerzoom({lat: ev.lat + 0.004, lon: ev.lng}, 15, true);
 
-        events.loadNewData(ev);
+      //   events.loadNewData(ev);
 
-        d3.select('#event-window').classed('zoom', false);
+      //   d3.select('#event-window').classed('zoom', false);
 
-        events.animate();
+      //   events.animate();
         
-        //Deactivates event and runs next animation
-        setTimeout(function() { 
-          //Deactivate old pulse
-          pulseLayer.findPulseByID(ev.id)
-            .classed('active-pulse', false).classed('inactive-pulse', true);
+      //   //Deactivates event and runs next animation
+      //   setTimeout(function() { 
+      //     //Deactivate old pulse
+      //     pulseLayer.findPulseByID(ev.id)
+      //       .classed('active-pulse', false).classed('inactive-pulse', true);
 
-          events.stopAnimation();
+      //     events.stopAnimation();
 
-          d3.select('#event-window').classed('zoom', true);
+      //     d3.select('#event-window').classed('zoom', true);
 
-          d3.select('#event-window').on(transitionEnd, function() {
-            if(d3.select(this).classed('zoom')) {
-              event_idx = (event_idx+1) % event_data.length;
-              event_loop(event_data, event_idx);
+      //     d3.select('#event-window').on(transitionEnd, function() {
+      //       if(d3.select(this).classed('zoom')) {
+      //         event_idx = (event_idx+1) % event_data.length;
+      //         event_loop(event_data, event_idx);
 
-              pulseLayer.findPulseByID(ev.id)
-                .classed('active-pulse', false).classed('inactive-pulse', true);
+      //         pulseLayer.findPulseByID(ev.id)
+      //           .classed('active-pulse', false).classed('inactive-pulse', true);
 
-              //Cleanup leaks
-              ev = null;
-              new_pulse = null;
-            }
-          });
+      //         //Cleanup leaks
+      //         ev = null;
+      //         new_pulse = null;
+      //       }
+      //     });
 
 
-        }, 14000);
-      //}, 2000);
+      //   }, 14000);
+      // //}, 2000);
 
     }
     
