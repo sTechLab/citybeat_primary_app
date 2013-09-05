@@ -93,13 +93,12 @@ var fetch_data = function(cb) {
 // var pulseLayer = PulseLayer(); 
 
 /* MAP */
-  var layer = mapbox.layer().id('raziku.map-6nox10c2');
+  // var layer = mapbox.layer().id('raziku.map-6nox10c2');
 
-
-  var map = mapbox.map('map', layer, null, []);
+  var map = L.mapbox.map('map', 'raziku.map-6nox10c2').setView([40.75275880391166,-73.97139047965452],13);
   window.map = map;
-  map.center({ lat: 40.75275880391166, lon: -73.97139047965452 });
-  map.zoom(13, true);
+  // map.center({ lat: 40.75275880391166, lon: -73.97139047965452 });
+  // map.zoom(13, true);
 
   fetch_data(function(error, pulse_data, event_data) {
     if(error) { 
@@ -191,6 +190,24 @@ var fetch_data = function(cb) {
       // //}, 2000);
 
     }
+
+    L.mapbox.markerLayer({
+    // this feature is in the GeoJSON format: see geojson.org
+    // for the full specification
+    type: 'Feature',
+    geometry: {
+        type: 'Point',
+        // coordinates here are in longitude, latitude order because
+        // x, y is the standard for GeoJSON and many formats
+        coordinates: [-73.97139047965452,40.75275880391166]
+    },
+    properties: {
+        title: 'A Single Marker',
+        description: 'Just one of me',
+        'marker-size': 'small',
+        'marker-color': '#f0a'
+    }
+  }).addTo(map);
     
     d3.select('#event-window').classed('zoom', true);
     event_loop(event_data, 0);
