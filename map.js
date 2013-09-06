@@ -1,7 +1,42 @@
-  /* Set up defaults */
-  var start_scale = 1;
-  var pulse_rate = 2000;
-  var scale_factor = 120;
+
+/* Set up defaults */
+var start_scale = 1;
+var pulse_rate = 2000;
+var scale_factor = 120;
+
+/* Set up map, add pulse layer, get data, animate data */
+// $(window).ready(function() {
+
+/* Header */
+  /* Weather */
+  $.getJSON(location.origin + '/jet/weather/NYC',
+    function(data) {
+      var temp = parseInt(data.current_observation.temp_f);
+      var type = data.current_observation.weather;
+      $('#weather-temp').text(temp);
+      $('#weather-type').text(type);
+    }
+  );
+  /* Weather */
+
+  /* Time */
+  function set_time() {
+    var date_obj = Date.now();
+    var day = date_obj.toString("dddd");
+    var date = date_obj.toString("MMMM d, yyyy");
+    $('#date-day').text(day);
+    $('#date').text(date);
+
+    
+    var time = date_obj.toString("h:mm tt");
+    $('#time').text(time);
+  }
+
+  set_time();
+  setInterval(set_time, 10)
+  /* Time */
+
+
 
   /* Figure out what the data pulse rate is based on deviation */
   var data_pulse_prop = function(deviation, scale_function, pulse_function) {
@@ -68,11 +103,13 @@
               'coordinates': [evt.location.longitude,evt.location.latitude]
             },
             'properties': {        
-              'title': evt.text,
               'icon': {
                 'iconUrl': url,
                 'iconSize': [5, 5]
-              }
+              },
+            'text': evt.text,
+            'person': evt.entities.user_mentions[0],
+            'time': evt.created_time
             }
           };
 
@@ -85,6 +122,23 @@
       map.markerLayer.on('layeradd', function(e) {
         var marker = e.layer,
         feature = marker.feature;
+
+        console.log("these are the features")
+        console.log(feature)
+
+        var popupContent = null;
+
+        // Create custom popup content
+        var popupContent =  '<a target="_blank" class="popup" href="' + feature.properties.url + '">' +
+                            '<img src="/blue_dot.png">' +
+                        '   <h2>' + feature.properties.text + '</h2>' +
+                        '</a>';
+
+        // http://leafletjs.com/reference.html#popup
+        marker.bindPopup(popupContent,{
+          closeButton: false,
+          minWidth: 320
+        });
 
         marker.setIcon(L.icon(feature.properties.icon));
       });
