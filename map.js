@@ -108,7 +108,7 @@ var scale_factor = 120;
                 'iconSize': [5, 5]
               },
             'text': evt.text,
-            'person': evt.entities.user_mentions[0],
+            'person': evt.user.screen_name,
             'time': evt.created_time
             }
           };
@@ -128,10 +128,18 @@ var scale_factor = 120;
 
         var popupContent = null;
 
+        // console.log(Date.now().getTime()/1000)
+        // console.log(feature.properties.time)
+        // console.log(Date.now().getTime()/1000 - feature.properties.time)
+
+        var ago = Math.ceil(Date.now().getTime()/1000) - feature.properties.time;
+
         // Create custom popup content
         var popupContent =  '<a target="_blank" class="popup" href="' + feature.properties.url + '">' +
                             '<img src="/blue_dot.png">' +
                         '   <h2>' + feature.properties.text + '</h2>' +
+                        '   <span id="user">   @' + feature.properties.person + '   </span>' + 
+                        '   <span id="time_tool">' + ago + ' minutes ago</span>' +        
                         '</a>';
 
         // http://leafletjs.com/reference.html#popup

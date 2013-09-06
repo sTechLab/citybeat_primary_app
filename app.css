@@ -17,6 +17,32 @@ html, body {
   background: #1d1d1d;
 }
 
+.popup{
+
+}
+
+.popup h2{
+	font-size: 16px;
+	color: black;  
+	font-family: 'Pontano Sans', sans-serif;
+	text-decoration: none;
+}
+
+#user, #time_tool{
+	display: inline-block;
+	font-family: 'Pontano Sans', sans-serif;
+	text-decoration: none;
+	color: black;
+}
+#user{
+	font-size: 14px;
+	background-color: gray;
+	color: white;
+}
+#time_tool{
+	width:100%;
+}
+
 /* Header */
 #header {
   height: 50px;
