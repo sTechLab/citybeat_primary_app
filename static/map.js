@@ -4,6 +4,15 @@ var start_scale = 1;
 var pulse_rate = 2000;
 var scale_factor = 120;
 
+var mayor_race = ["@Quinn4NY", "@BilldeBlasio","@billthompsonnyc", "@anthonyweiner", "@johncliu", "@salalbanese2013"]
+var comptroller_race = ["@stringer2013", "@spitzer2013"]
+var public_advocate_race = ["@reshmasaujani", "@squadron4NY", "@tish2013"]
+var manhatten_president_race = ["@galeforMBP", "@juliemenin", "@jesslappin", "@RJackson_NYC"]
+var queens_president_race = ["@melindakatz", "@pfvjr"]
+var brooklyn_da_race = ["@hynesforda", "@KenThompson4DA"]
+var repub_mayor_primary_race = ["@joelhota", "@jcats2013", "@mcdonald4nyc"]
+
+
 /* Set up map, add pulse layer, get data, animate data */
 // $(window).ready(function() {
 
@@ -37,7 +46,6 @@ var scale_factor = 120;
   /* Time */
 
 
-
   /* Figure out what the data pulse rate is based on deviation */
   var data_pulse_prop = function(deviation, scale_function, pulse_function) {
     var props = {"start_scale": start_scale, "pulse_rate": pulse_rate,
@@ -62,32 +70,34 @@ var scale_factor = 120;
     var map = L.mapbox.map('map', 'raziku.map-6nox10c2').setView([40.75275880391166,-73.97139047965452],13);
     window.map = map;
 
-    d3.json('data2.json', function(error, json) {
-      if(error) {
-        console.log(error);
-        cb(error);
-        return;
-      }
+    d3.json('http://localhost:8000/tweets/@ChrisCQuinn@BilldeBlasio', function(error,json) {
+      console.log(json)
+      console.log("whale")
+
+      // if(error) {
+      //   console.log(error);
+      //   return;
+      // }
       json.forEach(function(evt){
         var url = "";
 
         if(evt.text.indexOf("Quinn4NY") != -1 || evt.text.indexOf("ChrisCQuinn") != -1 ){
-          url = "/red_dot.png";
+          url = "/static/red_dot.png";
         }
         else if(evt.text.indexOf("deblasionyc") != -1 || evt.text.indexOf("BilldeBlasio") != -1){
-          url = "/green_dot.png";
+          url = "/static/green_dot.png";
         }
         else if(evt.text.indexOf("billthompsonnyc") != -1){
-          url = "/blue_dot.png";
+          url = "/static/blue_dot.png";
         }
         else if(evt.text.indexOf("anthonyweiner") != -1){
-          url = "/yellow_dot.png";
+          url = "/static/yellow_dot.png";
         }
         else if(evt.text.indexOf("JohnLiu2013") != -1 || evt.text.indexOf("johncliu") != -1){
-          url = "/orange_dot.png";
+          url = "/static/orange_dot.png";
         }
         else if(evt.text.indexOf("salalbanese2013") != -1){
-          url = "/lightblue_dot.png";
+          url = "/static/lightblue_dot.png";
         }
 
         console.log(evt);
