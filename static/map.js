@@ -4,7 +4,7 @@ var start_scale = 1;
 var pulse_rate = 2000;
 var scale_factor = 120;
 
-var colors = ["yellow", "purple", "blue", "light_blue", "pink", "orange"]
+var colors = ["yellow", "red", "blue", "lightblue", "pink", "green"]
 
 var mayor_race = ["@Quinn4NY", "@BilldeBlasio","@billthompsonnyc", "@anthonyweiner", "@johncliu", "@salalbanese2013"];
 var comptroller_race = ["@stringer2013", "@spitzer2013"];
@@ -15,14 +15,12 @@ var brooklyn_da_race = ["@hynesforda", "@KenThompson4DA"];
 var repub_mayor_primary_race = ["@joelhota", "@jcats2013", "@mcdonald4nyc"];
 
 var mayor_race_name = ["Christine Quinn", "Bill de Blasio","Bill Thompson", "Anthony Weiner", "John Liu", "Sal Albanese"];
-var comptroller_race_name = ["@stringer2013", "@spitzer2013"];
-var public_advocate_race_name = ["@reshmasaujani", "@squadron4NY", "@tish2013"];
-var manhatten_president_race_name = ["@galeforMBP", "@juliemenin", "@jesslappin", "@RJackson_NYC"];
-var queens_president_race_name = ["@melindakatz", "@pfvjr"];
-var brooklyn_da_race_name = ["@hynesforda", "@KenThompson4DA"];
-var repub_mayor_primary_race_name = ["@joelhota", "@jcats2013", "@mcdonald4nyc"];
-
-
+var comptroller_race_name = ["Scott Stringer", "Eliot Spitzer"];
+var public_advocate_race_name = ["Reshma Saujani", "Daniel Squadron", "Letitia James"];
+var manhatten_president_race_name = ["Gale Brewer", "Julie Menin", "Jessica Lappin", "Robert Jackson"];
+var queens_president_race_name = ["Melinda Katz", "Peter Vallone"];
+var brooklyn_da_race_name = ["Charles J. Hynes", "Ken Thompson"];
+var repub_mayor_primary_race_name = ["Joe Lhota", "John Catsimatidis", "George McDonald"];
 
 var geoJson = [];
 
@@ -82,7 +80,7 @@ var data_pulse_prop = function(deviation, scale_function, pulse_function) {
   window.map = map;
 
 /* Fetch Data, create geo features */
-function fetch_data(tag) {
+function fetch_data(tag, current_race) {
   console.log("went into fetch data")
 
   d3.json('http://localhost:8000/tweets/' + tag, function(error,json) {
@@ -96,29 +94,12 @@ function fetch_data(tag) {
     json.forEach(function(evt){
       var url = "";
 
-      if(evt.text.indexOf("Quinn4NY") != -1 || evt.text.indexOf("ChrisCQuinn") != -1 ){
-        url = "/static/red_dot.png";
-      }
-      else if(evt.text.indexOf("deblasionyc") != -1 || evt.text.indexOf("BilldeBlasio") != -1){
-        url = "/static/green_dot.png";
-      }
-      else if(evt.text.indexOf("billthompsonnyc") != -1){
-        url = "/static/blue_dot.png";
-      }
-      else if(evt.text.indexOf("anthonyweiner") != -1){
-        url = "/static/yellow_dot.png";
-      }
-      else if(evt.text.indexOf("JohnLiu2013") != -1 || evt.text.indexOf("johncliu") != -1){
-        url = "/static/orange_dot.png";
-      }
-      else if(evt.text.indexOf("salalbanese2013") != -1){
-        url = "/static/lightblue_dot.png";
-      }
+      var index = current_race.indexOf(tag);
+      console.log(current_race.indexOf(tag));
 
-      console.log(evt);
-      console.log(evt.location.longitude);
-      console.log(evt.location.latitude);
-
+      console.log(tag + "-->" + colors[index])
+      url = "/static/"+colors[index]+"_dot.png"
+      
       var geoPoint = {
         'type': 'Feature',
         'geometry': {
@@ -147,9 +128,6 @@ function fetch_data(tag) {
     map.markerLayer.on('layeradd', function(e) {
       var marker = e.layer,
       feature = marker.feature;
-
-      console.log("these are the features")
-      console.log(feature)
 
       var popupContent = null;
 
@@ -184,14 +162,15 @@ function fetch_data(tag) {
 function update(race){
   geoJson = [];
   race.forEach(function(candidate){
-    fetch_data(candidate);
+    fetch_data(candidate, race);
   })
 }
 
 function banner(race, race_name){
+  $("#banner").children().remove();
+
   var length = race.length;
   var width = ($(window).width()/length) - 40;
-  console.log(length)
 
   race.forEach(function(candidate, i){
     var div = $("#banner").append("<div class='candidate " + candidate.substring(1)+ "' style='width: " + width + "'></div>");
@@ -216,15 +195,14 @@ function change_race(race, race_name){
 
 $(document).ready(function () {
     $("#races").bind('change', function(d) {
-        console.log($(this).find('option:selected').attr("value") + "," +  $(this).find('option:selected').attr("value") + "_name")
-        change_race($(this).find('option:selected').attr("value"), $(this).find('option:selected').attr("value") + "_name")
+        change_race(eval($(this).find('option:selected').attr("value")), eval($(this).find('option:selected').attr("value") + "_name"));
     });
 });
 
 // End JQuery for UI
 
 banner(mayor_race, mayor_race_name);
-// update(mayor_race);
+update(mayor_race);
 
 
 
