@@ -17,10 +17,16 @@ def get_document(id):
     print "these are the ids"
     print ids
 
+    ids.pop(0)
+    print ids
+
     entities= ["["]
-    for post in db['tweets'].find({'text': {'$regex':'^(?=.*'+ id + ').*'}}):
-        entities.append(json.dumps(post))
-        entities.append(",")
+
+    for id in ids:
+        print "went in"
+        for post in db['tweets'].find({'text': {'$regex':'^(?=.*'+ id + ').*'}}):
+            entities.append(json.dumps(post))
+            entities.append(",")
 
     entities[len(entities)-1] = "]"
     # print length

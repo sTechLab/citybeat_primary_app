@@ -46,7 +46,7 @@ html, body {
 /* Header */
 #header {
   height: 50px;
-
+  z-index: 5;
   background: black;
   color: rgb(187, 187, 187);
 }
@@ -106,14 +106,43 @@ font-size: 15px;
 /* Banner */
 
 #banner{
-	position: absolute;
-	top: 5% + 50px;
+	position: fixed;
+	top: 5%;
 	height: 18%;
 	width: 100%;
-	background-color: grey;
+	background-color: #606060;
+  opacity: 0.7;
+  z-index: 4;
 }
 h3{
 	color: white;
+}
+.candidate{
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  width: 50px;
+}
+.candidate text{
+  color:white;
+  font-size: 1.1em;
+}
+.top_span, .bottom_span{
+  display: inline-block;
+  color: white;
+  font-size: .9em;
+}
+.bottom_span{
+  font-size: .8em;
+}
+
+.img{
+  width:50%;
+  float: left;
+}
+.text_half{
+  width:50%;
+  float: right;
 }
 
 /*End Banner*/
@@ -121,8 +150,13 @@ h3{
 /* Map */
 #map { 
   position:absolute;
-  top: 23%;
+  top: 5%;
   bottom: 0;
   width:100%; 
+  z-index: 2;
+}
+
+.leaflet-control-zoom{
+  display:none;
 }
 /* End Map */
