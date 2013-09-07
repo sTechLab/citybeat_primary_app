@@ -4,6 +4,8 @@ var start_scale = 1;
 var pulse_rate = 2000;
 var scale_factor = 120;
 
+var colors = ["yellow", "purple", "blue", "light_blue", "pink", "orange"]
+
 var mayor_race = ["@Quinn4NY", "@BilldeBlasio","@billthompsonnyc", "@anthonyweiner", "@johncliu", "@salalbanese2013"];
 var comptroller_race = ["@stringer2013", "@spitzer2013"];
 var public_advocate_race = ["@reshmasaujani", "@squadron4NY", "@tish2013"];
@@ -13,6 +15,14 @@ var brooklyn_da_race = ["@hynesforda", "@KenThompson4DA"];
 var repub_mayor_primary_race = ["@joelhota", "@jcats2013", "@mcdonald4nyc"];
 
 var mayor_race_name = ["Christine Quinn", "Bill de Blasio","Bill Thompson", "Anthony Weiner", "John Liu", "Sal Albanese"];
+var comptroller_race_name = ["@stringer2013", "@spitzer2013"];
+var public_advocate_race_name = ["@reshmasaujani", "@squadron4NY", "@tish2013"];
+var manhatten_president_race_name = ["@galeforMBP", "@juliemenin", "@jesslappin", "@RJackson_NYC"];
+var queens_president_race_name = ["@melindakatz", "@pfvjr"];
+var brooklyn_da_race_name = ["@hynesforda", "@KenThompson4DA"];
+var repub_mayor_primary_race_name = ["@joelhota", "@jcats2013", "@mcdonald4nyc"];
+
+
 
 var geoJson = [];
 
@@ -87,22 +97,22 @@ function fetch_data(tag) {
       var url = "";
 
       if(evt.text.indexOf("Quinn4NY") != -1 || evt.text.indexOf("ChrisCQuinn") != -1 ){
-        url = "/static/dots/red_dot.png";
+        url = "/static/red_dot.png";
       }
       else if(evt.text.indexOf("deblasionyc") != -1 || evt.text.indexOf("BilldeBlasio") != -1){
-        url = "/static/dots/green_dot.png";
+        url = "/static/green_dot.png";
       }
       else if(evt.text.indexOf("billthompsonnyc") != -1){
-        url = "/static/dots/blue_dot.png";
+        url = "/static/blue_dot.png";
       }
       else if(evt.text.indexOf("anthonyweiner") != -1){
-        url = "/static/dots/yellow_dot.png";
+        url = "/static/yellow_dot.png";
       }
       else if(evt.text.indexOf("JohnLiu2013") != -1 || evt.text.indexOf("johncliu") != -1){
-        url = "/static/dots/orange_dot.png";
+        url = "/static/orange_dot.png";
       }
       else if(evt.text.indexOf("salalbanese2013") != -1){
-        url = "/static/dots/lightblue_dot.png";
+        url = "/static/lightblue_dot.png";
       }
 
       console.log(evt);
@@ -180,15 +190,18 @@ function update(race){
 
 function banner(race, race_name){
   var length = race.length;
-  var width = $(window).width()/length
+  var width = ($(window).width()/length) - 40;
   console.log(length)
 
   race.forEach(function(candidate, i){
     var div = $("#banner").append("<div class='candidate " + candidate.substring(1)+ "' style='width: " + width + "'></div>");
-    $("."+candidate.substring(1)+"").append("<div class='img'></div>")
+    $("."+candidate.substring(1)+"").append("<div class='"+ candidate.substring(1) +"_img img'></div>")
+    $("."+candidate.substring(1)+"_img").append("<img src='/static/"+ candidate.substring(1) +".png'>")
+
 
     $("."+candidate.substring(1)+"").append("<div class='"+candidate.substring(1)+"_text text_half'></div>")
     $("."+candidate.substring(1)+"_text").append("<text>"+race_name[i]+"</text>")
+    $("."+candidate.substring(1)+"_text").append("<div class='stat_box'></div>")
     $("."+candidate.substring(1)+"_text").append("<span class='top_span'>Tweets & Photos</span>")
     $("."+candidate.substring(1)+"_text").append("<span class='bottom_span'>in the past hour</span>")
   })
