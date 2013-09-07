@@ -207,7 +207,24 @@ function banner(race, race_name){
   })
 }
 
+function change_race(race, race_name){
+  update(race)
+  banner(race, race_name)
+}
+
+// JQuery for UI
+
+$(document).ready(function () {
+    $("#races").bind('change', function(d) {
+        console.log($(this).find('option:selected').attr("value") + "," +  $(this).find('option:selected').attr("value") + "_name")
+        change_race($(this).find('option:selected').attr("value"), $(this).find('option:selected').attr("value") + "_name")
+    });
+});
+
+// End JQuery for UI
+
 banner(mayor_race, mayor_race_name);
 // update(mayor_race);
+
 
 
