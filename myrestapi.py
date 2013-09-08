@@ -27,9 +27,9 @@ def get_document(id):
 
     for id in ids:
         print "went in"
-        for post in db['tweets'].find({'text': {'$regex':'^(?=.*'+ id + ').*'}}):
-            entities.append(json.dumps(post))
-            entities.append(",")
+        # for post in db['tweets'].find({'text': {'$regex':'^(?=.*'+ id + ').*'}}):
+        #     entities.append(json.dumps(post))
+        #     entities.append(",")
         for post in db['photos'].find({'caption.text': {'$regex':'^(?=.*'+ id + ').*'}}):
             entities.append(json.dumps(post))
             entities.append(",")
@@ -49,18 +49,22 @@ def server_static(filename):
 def get_tweets():
     print "went in to currnet tweets"
 
-    gen_time = datetime.datetime(2013, 1, 1)
-    dummy_id = ObjectId.from_datetime(gen_time)
+    # gen_time = datetime.datetime(2013, 1, 1)
+    # dummy_id = ObjectId.from_datetime(gen_time)
 
-    # end = time.mktime(ti.timetuple())
-    # start = time.mktime(ti.timetuple()) - 3600
+    # print dummy_id
+
+    ti = datetime.datetime.now()
+
+    end = time.mktime(ti.timetuple())
+    start = time.mktime(ti.timetuple()) - 3600
 
     # print start
     # print end
 
     entities= ["["]
 
-    for post in db['tweets'].find({"_id": {"$gt": dummy_id}}):
+    for post in db['tweets'].find({ 'created_time' : { '$regex' : ' > 135577899' } }):
         entities.append(json.dumps(post))
         entities.append(",")
         print post

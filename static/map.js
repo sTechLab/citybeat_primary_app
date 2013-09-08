@@ -152,12 +152,48 @@ var data_pulse_prop = function(deviation, scale_function, pulse_function) {
   var map = L.mapbox.map('map', 'raziku.map-6nox10c2').setView([40.75275880391166,-73.97139047965452],13);
   window.map = map;
 
+  MapCenterOffsetMixin = {
+    UIOffset: [0, 600], // x, y
+    getBounds: function(){
+        var a=this.getPixelBounds(),
+            b=this.unproject(new L.Point(a.min.x+this.UIOffset[0],a.max.y+this.UIOffset[1]), this._zoom,!0),
+            c=this.unproject(new L.Point(a.max.x,a.min.y),this._zoom,!0);
+            return new L.LatLngBounds(b,c)
+    },
+    _latLngToNewLayerPoint: function (latlng, newZoom, newCenter) {
+        var targetPoint = this.project(newCenter, newCenter).subtract([this.UIOffset[0]/2, this.UIOffset[1]/2]),
+            newCenter = this.unproject(targetPoint, newZoom);
+        var topLeft = this._getNewTopLeftPoint(newCenter, newZoom).add(this._getMapPanePos());
+        return this.project(latlng, newZoom)._subtract(topLeft);
+    },
+    _getCenterLayerPoint: function () {
+        return this.containerPointToLayerPoint(this.getSize().divideBy(2).add([this.UIOffset[0]/2, this.UIOffset[1]/2]));
+    },
+    _resetView: function (a, b, c, d) {
+        var e = this._zoom !== b;
+        // Change the center
+        var targetPoint = this.project(a, b).subtract([this.UIOffset[0] / 2, this.UIOffset[1]/2]),
+            a = this.unproject(targetPoint, b);
+        d || (this.fire("movestart"), e && this.fire("zoomstart")), this._zoom = b, this._initialTopLeftPoint = this._getNewTopLeftPoint(a);
+        if (!c) L.DomUtil.setPosition(this._mapPane, new L.Point(0, 0));
+        else {
+            var f = L.DomUtil.getPosition(this._mapPane);
+            this._initialTopLeftPoint._add(f)
+        }
+        this._tileLayersToLoad = this._tileLayersNum, this.fire("viewreset", {
+            hard: !c
+        }), this.fire("move"), (e || d) && this.fire("zoomend"), this.fire("moveend"), this._loaded || (this._loaded = !0, this.fire("load"))
+    }
+}
+
+L.Map.include(MapCenterOffsetMixin);
+
+
 /* Fetch Data, create geo features */
 function fetch_data(tag, current_race) {
   console.log("went into fetch data")
 
   d3.json('http://localhost:8000/tweets/' + tag, function(error,json) {
-    console.log(json)
     json.forEach(function(evt){
       var url = "";
 
@@ -186,7 +222,7 @@ function fetch_data(tag, current_race) {
           };
         }
         else{
-          console.log(evt)
+          console.log("went into instagram else")
           var geoPoint = {
           'type': 'Feature',
           'geometry': {
@@ -201,8 +237,9 @@ function fetch_data(tag, current_race) {
                 'iconSize': [5, 5]
               },
             'text': evt.caption.text,
-            'person': evt.user.screen_name,
-            'time': evt.created_time
+            'person': evt.user.user_name,
+            'time': evt.created_time,
+            'image' : evt.images.low_resolution.url
             }
           };
         }
@@ -210,7 +247,7 @@ function fetch_data(tag, current_race) {
         geoJson.push(geoPoint);
       });
 
-    console.log(geoJson);
+    // console.log(geoJson);
 
     d3.select('#event-window').classed('zoom', true);
     // event_loop(event_data, 0);
@@ -227,9 +264,11 @@ function fetch_data(tag, current_race) {
 
       var ago = Math.ceil(Date.now().getTime()/1000) - feature.properties.time;
 
+      console.log(feature.properties.image);
+
       // Create custom popup content
       var popupContent =  '<a target="_blank" class="popup" href="' + feature.properties.url + '">' +
-                          '<img src="/blue_dot.png">' +
+                          '<img src="' + feature.properties.image + '">' +
                       '   <h2>' + feature.properties.text + '</h2>' +
                       '   <span id="user">   @' + feature.properties.person + '   </span>' + 
                       '   <span id="time_tool">' + ago + ' minutes ago</span>' +        
@@ -242,6 +281,10 @@ function fetch_data(tag, current_race) {
       });
 
       marker.setIcon(L.icon(feature.properties.icon));
+    });
+
+    map.markerLayer.on('click', function(e) {
+        map.panTo(e.layer.getLatLng());
     });
 
     map.markerLayer.setGeoJSON(geoJson);
@@ -295,7 +338,7 @@ $(document).ready(function () {
 // End JQuery for UI
 
 banner(mayor_race, mayor_race_name);
-// update(mayor_race);
+update(mayor_race);
 
 
 
