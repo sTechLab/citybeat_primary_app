@@ -1,9 +1,11 @@
 import json
-from datetime import datetime
+import datetime
 import bottle
+import time
 from bottle import route, run, request, abort, template, static_file
 from pymongo import Connection
- 
+from bson.objectid import ObjectId
+
 connection = Connection('grande.rutgers.edu', 27017)
 db = connection['citybeat_production']
 
@@ -47,15 +49,24 @@ def server_static(filename):
 def get_tweets():
     print "went in to currnet tweets"
 
-    end = datetime.now()
+    gen_time = datetime.datetime(2013, 1, 1)
+    dummy_id = ObjectId.from_datetime(gen_time)
 
-    print end
+    # end = time.mktime(ti.timetuple())
+    # start = time.mktime(ti.timetuple()) - 3600
 
-    start = end - 3600;
+    # print start
+    # print end
 
-    for post in db['tweets'].find({'created_on':{'$gte': start, '$lt': end}}):
+    entities= ["["]
+
+    for post in db['tweets'].find({"_id": {"$gt": dummy_id}}):
+        entities.append(json.dumps(post))
+        entities.append(",")
         print post
 
-    return "nil"
+
+    entities[len(entities)-1] = "]"
+    return entities
 
 run(host='localhost', port=8000)
