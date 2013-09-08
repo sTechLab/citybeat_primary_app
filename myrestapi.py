@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 import bottle
 from bottle import route, run, request, abort, template, static_file
 from pymongo import Connection
@@ -27,15 +28,13 @@ def get_document(id):
         for post in db['tweets'].find({'text': {'$regex':'^(?=.*'+ id + ').*'}}):
             entities.append(json.dumps(post))
             entities.append(",")
+        for post in db['photos'].find({'caption.text': {'$regex':'^(?=.*'+ id + ').*'}}):
+            entities.append(json.dumps(post))
+            entities.append(",")
+            print "INSTAGRAM"
+            print post
 
     entities[len(entities)-1] = "]"
-    # print length
-    # entities.append("]")
-    # length = length.replace(length[len(length)-1], ']')
-    # entities[len(entities)-1] = length
-
-    # print '{"something":"1","mode":true,"number":1234}'
-
     if not entities:
         abort(404, 'No document with id %s' % id)
     return entities
@@ -43,5 +42,20 @@ def get_document(id):
 @route('/static/<filename>')
 def server_static(filename):
     return static_file(filename, root='static')
+
+@route('/current_tweets', method='GET')
+def get_tweets():
+    print "went in to currnet tweets"
+
+    end = datetime.now()
+
+    print end
+
+    start = end - 3600;
+
+    for post in db['tweets'].find({'created_on':{'$gte': start, '$lt': end}}):
+        print post
+
+    return "nil"
 
 run(host='localhost', port=8000)

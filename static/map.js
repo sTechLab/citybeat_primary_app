@@ -4,7 +4,7 @@ var start_scale = 1;
 var pulse_rate = 2000;
 var scale_factor = 120;
 
-var colors = ["yellow", "red", "blue", "lightblue", "pink", "green"]
+var colors = ["yellow", "red", "blue", "lightblue", "green", "orange"]
 
 var mayor_race = ["@Quinn4NY", "@BilldeBlasio","@billthompsonnyc", "@anthonyweiner", "@johncliu", "@salalbanese2013"];
 var comptroller_race = ["@stringer2013", "@spitzer2013"];
@@ -58,6 +58,79 @@ setInterval(set_time, 10)
 /* Time */
 
 
+
+/* TICKER */
+
+  //Random async handling stuff
+  var when = function() {
+    var args = arguments;  // the functions to execute first
+    return {
+      then: function(done) {
+        var counter = 0;
+        for(var i = 0; i < args.length; i++) {
+          // call each function with a function to call on done
+          args[i](function() {
+            counter++;
+            if(counter === args.length) {  // all functions have notified they're done
+              done();
+            }
+          });
+        }
+      }
+    };
+  };
+
+  var venue_data = [];
+  var trend_data = [];
+
+  //Build Ticker
+  when(
+    function(done) {
+      $.getJSON(location.origin + '/jet/foursquare/trending', function(data) {
+
+        var venues = data.response.venues;
+        for(var i in venues) {
+          var venue = venues[i];
+          venue_data.push({name: venue.name, hereNow: venue.hereNow ? venue.hereNow.count : 0});
+        }
+        done();
+      });
+    }, 
+    function(done) {
+      $.getJSON(location.origin + '/jet/twitter/trending', function(data) {
+
+        var trends = data[0].trends;
+        for(var i in trends) {
+          var trend = trends[i];
+          trend_data.push({name: trend.name, url: trend.url});
+        }
+        done(trend_data);
+      });
+    }
+  ).then(function() {
+
+    var li_list = "";
+
+    li_list += $('<li></li>').text('Foursquare Trending Venues:').addClass('ticker-topic').prop('outerHTML');
+    for(var i in venue_data) {
+      li_list += $('<li></li>').text(venue_data[i].name).prop('outerHTML');
+    }
+
+    li_list += $('<li></li>').text("Twitter Trending Topics:").addClass('ticker-topic').prop('outerHTML');
+    for(var i in trend_data) {
+      li_list += $('<li></li>').text(trend_data[i].name).prop('outerHTML');
+    }
+
+    $('#ticker').append(li_list);
+    $('#ticker').webTicker({
+      startEmpty: true
+    });
+  });
+
+
+/* TICKER */
+
+
 /* Figure out what the data pulse rate is based on deviation */
 var data_pulse_prop = function(deviation, scale_function, pulse_function) {
   var props = {"start_scale": start_scale, "pulse_rate": pulse_rate,
@@ -85,42 +158,59 @@ function fetch_data(tag, current_race) {
 
   d3.json('http://localhost:8000/tweets/' + tag, function(error,json) {
     console.log(json)
-    console.log("whale")
-
-    // if(error) {
-    //   console.log(error);
-    //   return;
-    // }
     json.forEach(function(evt){
       var url = "";
 
+      //assign dot color
       var index = current_race.indexOf(tag);
-      console.log(current_race.indexOf(tag));
-
-      console.log(tag + "-->" + colors[index])
       url = "/static/"+colors[index]+"_dot.png"
-      
-      var geoPoint = {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-            // coordinates here are in longitude, latitude order because
-            // x, y is the standard for GeoJSON and many formats
-            'coordinates': [evt.location.longitude,evt.location.latitude]
-          },
-          'properties': {        
-            'icon': {
-              'iconUrl': url,
-              'iconSize': [5, 5]
+
+      if(evt.mid_lng == null){ //this is a tweet
+        var geoPoint = {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Point',
+              // coordinates here are in longitude, latitude order because
+              // x, y is the standard for GeoJSON and many formats
+              'coordinates': [evt.location.longitude,evt.location.latitude]
             },
-          'text': evt.text,
-          'person': evt.user.screen_name,
-          'time': evt.created_time
-          }
-        };
+            'properties': {        
+              'icon': {
+                'iconUrl': url,
+                'iconSize': [5, 5]
+              },
+            'text': evt.text,
+            'person': evt.user.screen_name,
+            'time': evt.created_time
+            }
+          };
+        }
+        else{
+          console.log(evt)
+          var geoPoint = {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Point',
+              // coordinates here are in longitude, latitude order because
+              // x, y is the standard for GeoJSON and many formats
+              'coordinates': [evt.location.longitude,evt.location.latitude]
+            },
+            'properties': {        
+              'icon': {
+                'iconUrl': url,
+                'iconSize': [5, 5]
+              },
+            'text': evt.caption.text,
+            'person': evt.user.screen_name,
+            'time': evt.created_time
+            }
+          };
+        }
 
         geoJson.push(geoPoint);
       });
+
+    console.log(geoJson);
 
     d3.select('#event-window').classed('zoom', true);
     // event_loop(event_data, 0);
@@ -173,9 +263,12 @@ function banner(race, race_name){
   var width = ($(window).width()/length) - 40;
 
   race.forEach(function(candidate, i){
+    var index = race.indexOf(candidate);
+
     var div = $("#banner").append("<div class='candidate " + candidate.substring(1)+ "' style='width: " + width + "'></div>");
     $("."+candidate.substring(1)+"").append("<div class='"+ candidate.substring(1) +"_img img'></div>")
-    $("."+candidate.substring(1)+"_img").append("<img src='/static/"+ candidate.substring(1) +".png'>")
+    $("."+candidate.substring(1)+"_img").append("<img src='/static/"+ candidate.substring(1) +".jpg'>")
+    $("."+candidate.substring(1)+"_img").append("<div class='color_banner' style='background-color:"+ colors[index] +"'>")
 
 
     $("."+candidate.substring(1)+"").append("<div class='"+candidate.substring(1)+"_text text_half'></div>")
@@ -187,8 +280,8 @@ function banner(race, race_name){
 }
 
 function change_race(race, race_name){
-  update(race)
   banner(race, race_name)
+  update(race)
 }
 
 // JQuery for UI
@@ -202,7 +295,7 @@ $(document).ready(function () {
 // End JQuery for UI
 
 banner(mayor_race, mayor_race_name);
-update(mayor_race);
+// update(mayor_race);
 
 
 
