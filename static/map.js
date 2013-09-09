@@ -3,16 +3,18 @@
 var start_scale = 1;
 var pulse_rate = 2000;
 var scale_factor = 120;
+var tickerOn = new Boolean()
+tickerOn= false;
 
 var colors = ["yellow", "red", "blue", "lightblue", "green", "orange"]
 
-var mayor_race = ["@Quinn4NY", "@BilldeBlasio","@billthompsonnyc", "@anthonyweiner", "@johncliu", "@salalbanese2013"];
-var comptroller_race = ["@stringer2013", "@spitzer2013"];
-var public_advocate_race = ["@reshmasaujani", "@squadron4NY", "@tish2013"];
-var manhatten_president_race = ["@galeforMBP", "@juliemenin", "@jesslappin", "@RJackson_NYC"];
-var queens_president_race = ["@melindakatz", "@pfvjr"];
-var brooklyn_da_race = ["@hynesforda", "@KenThompson4DA"];
-var repub_mayor_primary_race = ["@joelhota", "@jcats2013", "@mcdonald4nyc"];
+var mayor_race = [["@Quinn4NY", "@ChrisCQuinn", "#quinn", "quinn"], ["@BilldeBlasio", "@deblasionyc", "blasio", "#TeamdeBlasio", "#deblasio"],["@billthompsonnyc", "#thompson"], ["@anthonyweiner", "#weiner"], ["@johncliu", "@JohnLiu2013", "#liu"], ["#albanese", "@salalbanese2013"]]
+var comptroller_race = [["@stringer2013", "#stringer", "@scottmstringer"], ["@spitzer2013", "#spitzer"]];
+var public_advocate_race = [["@reshmasaujani", "#saujani", "saujani"], ["@squadron4NY", "@danielsquadron", "#squadron"], ["@tish2013", "@tishjames", " #teamtish", "#tish"]];
+var manhatten_president_race = [["@galeforMBP", "@galeabrewer", "#gale", "#galebrewer", "#brewer"], ["@juliemenin", "#menin", "menin"], ["@jesslappin", "#lappin", "lappin"], ["@RJackson_NYC", "#jackson"]];
+var queens_president_race = [["@melindakatz", "#katz"], ["@pfvjr", "#vallone"]];
+var brooklyn_da_race = [["@hynesforda", "#hynes", "@brooklynda"], ["@KenThompson4DA", "#kenthompson"]];
+var repub_mayor_primary_race = [["@joelhota", "@joelhota4mayor"], ["@jcats2013"], ["@mcdonald4nyc"]];
 
 var mayor_race_name = ["Christine Quinn", "Bill de Blasio","Bill Thompson", "Anthony Weiner", "John Liu", "Sal Albanese"];
 var comptroller_race_name = ["Scott Stringer", "Eliot Spitzer"];
@@ -23,7 +25,6 @@ var brooklyn_da_race_name = ["Charles J. Hynes", "Ken Thompson"];
 var repub_mayor_primary_race_name = ["Joe Lhota", "John Catsimatidis", "George McDonald"];
 
 var geoJson = [];
-
 
 /* Set up map, add pulse layer, get data, animate data */
 // $(window).ready(function() {
@@ -190,18 +191,29 @@ L.Map.include(MapCenterOffsetMixin);
 
 
 /* Fetch Data, create geo features */
-function fetch_data(tag, current_race) {
-  console.log("went into fetch data")
+function fetch_data(current_race, race_name, names_in_race) {
 
-  d3.json('http://localhost:8000/tweets/' + tag, function(error,json) {
+  d3.json('static/'+ race_name + '_2.json', function(error,json) {
     json.forEach(function(evt){
       var url = "";
-
-      //assign dot color
-      var index = current_race.indexOf(tag);
-      url = "/static/"+colors[index]+"_dot.png"
-
       if(evt.mid_lng == null){ //this is a tweet
+
+      current_race.forEach(function(r, i){
+
+        r.forEach(function(name){
+          if(evt.text){
+            if((evt.text).indexOf(name) > 0){
+              url = "static/dots/"+colors[i]+"_dot.png" 
+            }
+          }
+        });
+      });
+
+      if (url == "") {
+        url="static/dots/orange_dot.png"
+      };
+
+
         var geoPoint = {
           'type': 'Feature',
           'geometry': {
@@ -216,13 +228,28 @@ function fetch_data(tag, current_race) {
                 'iconSize': [5, 5]
               },
             'text': evt.text,
-            'person': evt.user.screen_name,
-            'time': evt.created_time
+            'person': "@" + evt.user.screen_name,
+            'time': evt.created_time,
+            'image': ""
             }
           };
         }
         else{
-          console.log("went into instagram else")
+
+        current_race.forEach(function(r, i){
+          r.forEach(function(name){
+            if(evt.caption.text){
+              if((evt.caption.text).indexOf(name) > 0){
+                url = "static/dots/"+colors[i]+"_dot.png" 
+              }
+            }
+          });
+        });
+
+        if (url == "") {
+          url="static/dots/orange_dot.png"
+        };
+
           var geoPoint = {
           'type': 'Feature',
           'geometry': {
@@ -237,7 +264,7 @@ function fetch_data(tag, current_race) {
                 'iconSize': [5, 5]
               },
             'text': evt.caption.text,
-            'person': evt.user.user_name,
+            'person': evt.user.username,
             'time': evt.created_time,
             'image' : evt.images.low_resolution.url
             }
@@ -247,7 +274,6 @@ function fetch_data(tag, current_race) {
         geoJson.push(geoPoint);
       });
 
-    // console.log(geoJson);
 
     d3.select('#event-window').classed('zoom', true);
     // event_loop(event_data, 0);
@@ -258,20 +284,17 @@ function fetch_data(tag, current_race) {
 
       var popupContent = null;
 
-      // console.log(Date.now().getTime()/1000)
-      // console.log(feature.properties.time)
-      // console.log(Date.now().getTime()/1000 - feature.properties.time)
-
-      var ago = Math.ceil(Date.now().getTime()/1000) - feature.properties.time;
-
-      console.log(feature.properties.image);
-
+    var date_obj = new Date(feature.properties.time * 1000);
+    var day = date_obj.toString("dddd");
+    var date = date_obj.toString("MMMM d, yyyy");
+    
+    var time = date_obj.toString("h:mm tt");
       // Create custom popup content
       var popupContent =  '<a target="_blank" class="popup" href="' + feature.properties.url + '">' +
                           '<img src="' + feature.properties.image + '">' +
                       '   <h2>' + feature.properties.text + '</h2>' +
-                      '   <span id="user">   @' + feature.properties.person + '   </span>' + 
-                      '   <span id="time_tool">' + ago + ' minutes ago</span>' +        
+                      '   <span id="user">   ' + feature.properties.person + '   </span>' + 
+                      '   <span id="time_tool">' + day + " " + date + " " + time + '</span>' +        
                       '</a>';
 
       // http://leafletjs.com/reference.html#popup
@@ -285,18 +308,37 @@ function fetch_data(tag, current_race) {
 
     map.markerLayer.on('click', function(e) {
         map.panTo(e.layer.getLatLng());
+
+      console.log("WHALE")
+      var markers = [];
+      this.eachLayer(function(marker) { markers.push(marker); });
+      cycle(markers);
     });
 
-    map.markerLayer.setGeoJSON(geoJson);
+    function cycle(markers) {
+      var i = 0;
+      function run() {
+          // if (++i > markers.length - 1) i = 0;
+          i = Math.floor((Math.random()*markers.length)+1)
+          map.setView(markers[i].getLatLng(), 13);
+          markers[i].openPopup();
+          window.setTimeout(run, 3000);
+      }
+      run();
+  }
 
+    map.markerLayer.setGeoJSON(geoJson);
   });
 }
 
-function update(race){
+function update(race, race_name, names_in_race){
   geoJson = [];
-  race.forEach(function(candidate){
-    fetch_data(candidate, race);
-  })
+  map.markerLayer.setGeoJSON(geoJson);
+  fetch_data(race, race_name, names_in_race)
+
+  // race.forEach(function(candidate){
+  //   fetch_data(candidate, race);
+  // })
 }
 
 function banner(race, race_name){
@@ -305,40 +347,40 @@ function banner(race, race_name){
   var length = race.length;
   var width = ($(window).width()/length) - 40;
 
-  race.forEach(function(candidate, i){
-    var index = race.indexOf(candidate);
+  race.forEach(function(candidate_arr, i){
+    var index = race.indexOf(candidate_arr);
+    candidate=candidate_arr[0];
 
-    var div = $("#banner").append("<div class='candidate " + candidate.substring(1)+ "' style='width: " + width + "'></div>");
+    var div = $("#banner").append("<li class='candidate " + candidate.substring(1)+ "' style='width: " + width + "'></li>");
     $("."+candidate.substring(1)+"").append("<div class='"+ candidate.substring(1) +"_img img'></div>")
-    $("."+candidate.substring(1)+"_img").append("<img src='/static/"+ candidate.substring(1) +".jpg'>")
+    $("."+candidate.substring(1)+"_img").append("<img src='/static/candidates/"+ candidate.substring(1) +".jpg'>")
     $("."+candidate.substring(1)+"_img").append("<div class='color_banner' style='background-color:"+ colors[index] +"'>")
 
 
     $("."+candidate.substring(1)+"").append("<div class='"+candidate.substring(1)+"_text text_half'></div>")
     $("."+candidate.substring(1)+"_text").append("<text>"+race_name[i]+"</text>")
     $("."+candidate.substring(1)+"_text").append("<div class='stat_box'></div>")
-    $("."+candidate.substring(1)+"_text").append("<span class='top_span'>Tweets & Photos</span>")
-    $("."+candidate.substring(1)+"_text").append("<span class='bottom_span'>in the past hour</span>")
+
   })
 }
 
-function change_race(race, race_name){
+function change_race(race, race_name, name_of_race){
   banner(race, race_name)
-  update(race)
+
+  update(race, name_of_race, race_name)
 }
 
 // JQuery for UI
 
 $(document).ready(function () {
     $("#races").bind('change', function(d) {
-        change_race(eval($(this).find('option:selected').attr("value")), eval($(this).find('option:selected').attr("value") + "_name"));
+        change_race(eval($(this).find('option:selected').attr("value")), eval($(this).find('option:selected').attr("value") + "_name"), $(this).find('option:selected').attr("value"));
     });
 });
 
 // End JQuery for UI
 
 banner(mayor_race, mayor_race_name);
-update(mayor_race);
-
+update(mayor_race, "mayor_race", mayor_race_name);
 
 
