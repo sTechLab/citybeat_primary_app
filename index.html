@@ -5,9 +5,13 @@
 		<!-- Styles -->
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 		 <script src='//api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.js'></script>
+ 		 <script src='static/webticker.js'></script>
+
 		<!-- CSS -->
 		<link href='http://api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.css' rel='stylesheet'/>
+		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
 		<link href="static/app.css" rel="stylesheet"/>
 
 	</head>
@@ -20,11 +24,6 @@
 	      </div>
 
 	      <div class="right-header">
-	        <div id="weather-sec" class="column">
-	          <span id="weather-temp" class="heading-main"></span>
-	          <span id="weather-temp-suffix" class="heading-main">&deg; F</span>
-	          <span id="weather-type"></span>
-	        </div>
 
 	        <div id="date-sec" class="column">
 	          <span id="date-day"></span>
@@ -39,7 +38,10 @@
 
 	    <div id="top_colored_banner"></div>
 	    <div id="top_banner">
-	    	<span id="left_span">TWEETS,PHOTOSAND VIDEOS FROM THE PAST HOUR</span>
+	    	<span id="left_span">TWEETS AND PHOTOS FROM NYC PRIMARY DAY</span>
+
+	    	<a data-toggle="modal" href="#myModal"><span id="about">about</span></a>
+
 	    	<span id="right_span">Currently Showing:
 	    		<select id="races">
 	    			<option value="mayor_race">Democratic Mayoral Primary</option> 
@@ -52,16 +54,28 @@
 
 	    		</select>
 	    	</span>
-
 	    </div>
 
+			     <!-- Modal -->
+		  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		      <div class="modal-content">
+		        <div class="modal-body">
+		          ...
+		        </div>
+		      </div><!-- /.modal-content -->
+		    </div><!-- /.modal-dialog -->
+		  </div><!-- /.modal -->
+
 	    <div id="colored_banner"></div>
-		<div id="banner">
+		<ul id="banner">
 		
-		</div>
+		</ul>
 		<div id="map"></div>
 
-		 <ul id="ticker"></ul>
+		<a href="http://brown.stanford.edu/"><img src="/static/brown.png" id="brown_image"></img></a>
+		<a href="http://www.thenewyorkworld.com/"><img src="/static/nyw.png" id="nyw_image"></img></a>
+		<a href="http://towcenter.org/"><img src="/static/tow.png" id="tow_image"></img></a>
 
 		<script type="text/javascript" src="static/date.js"></script>
 		<script type="text/javascript" src="static/map.js"></script>
