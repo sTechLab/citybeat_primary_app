@@ -308,24 +308,22 @@ function fetch_data(current_race, race_name, names_in_race) {
 
     map.markerLayer.on('click', function(e) {
         map.panTo(e.layer.getLatLng());
-
-      console.log("WHALE")
-      var markers = [];
-      this.eachLayer(function(marker) { markers.push(marker); });
-      cycle(markers);
+        // var markers = [];
+        // this.eachLayer(function(marker) { markers.push(marker); });
+        // cycle(markers);
     });
 
-    function cycle(markers) {
-      var i = 0;
-      function run() {
-          // if (++i > markers.length - 1) i = 0;
-          i = Math.floor((Math.random()*markers.length)+1)
-          map.setView(markers[i].getLatLng(), 13);
-          markers[i].openPopup();
-          window.setTimeout(run, 3000);
-      }
-      run();
-  }
+  //   function cycle(markers) {
+  //     var i = 0;
+  //     function run() {
+  //         // if (++i > markers.length - 1) i = 0;
+  //         i = Math.floor((Math.random()*markers.length)+1)
+  //         map.setView(markers[i].getLatLng(), 13);
+  //         markers[i].openPopup();
+  //         window.setTimeout(run, 3000);
+  //     }
+  //     run();
+  // }
 
     map.markerLayer.setGeoJSON(geoJson);
   });
