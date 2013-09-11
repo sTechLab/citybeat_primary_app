@@ -3,26 +3,136 @@
 var start_scale = 1;
 var pulse_rate = 2000;
 var scale_factor = 120;
-var tickerOn = new Boolean()
-tickerOn= false;
+var tickerOn = false;
 
 var colors = ["yellow", "red", "blue", "lightblue", "green", "orange"]
 
-var mayor_race = [["@Quinn4NY", "@ChrisCQuinn", "#quinn", "quinn"], ["@BilldeBlasio", "@deblasionyc", "blasio", "#TeamdeBlasio", "#deblasio"],["@billthompsonnyc", "#thompson"], ["@anthonyweiner", "#weiner"], ["@johncliu", "@JohnLiu2013", "#liu"], ["#albanese", "@salalbanese2013"]]
-var comptroller_race = [["@stringer2013", "#stringer", "@scottmstringer"], ["@spitzer2013", "#spitzer"]];
-var public_advocate_race = [["@reshmasaujani", "#saujani", "saujani"], ["@squadron4NY", "@danielsquadron", "#squadron"], ["@tish2013", "@tishjames", " #teamtish", "#tish"]];
-var manhatten_president_race = [["@galeforMBP", "@galeabrewer", "#gale", "#galebrewer", "#brewer"], ["@juliemenin", "#menin", "menin"], ["@jesslappin", "#lappin", "lappin"], ["@RJackson_NYC", "#jackson"]];
-var queens_president_race = [["@melindakatz", "#katz"], ["@pfvjr", "#vallone"]];
-var brooklyn_da_race = [["@hynesforda", "#hynes", "@brooklynda"], ["@KenThompson4DA", "#kenthompson"]];
-var repub_mayor_primary_race = [["@joelhota", "@joelhota4mayor"], ["@jcats2013"], ["@mcdonald4nyc"]];
+var races = [
+  {
+    office: 'mayor',
+    candidates: [
+      {
+        name: "Christine Quinn",
+        search_terms: ["@Quinn4NY", "@ChrisCQuinn", "#quinn", "quinn"]
+      },
+      {
+        name: "Bill de Blasio",
+        search_terms: ["@BilldeBlasio", "@deblasionyc", "blasio", "#TeamdeBlasio", "#deblasio"]
+      },
+      {
+        name: "Bill Thompson",
+        search_terms: ["@billthompsonnyc", "#thompson"]
+      },
+      {
+        name: "Anthony Weiner",
+        search_terms: ["@anthonyweiner", "#weiner"]
+      },
+      {
+        name: "John Liu",
+        search_terms: ["@johncliu", "@JohnLiu2013", "#liu"]
+      },
+      {
+        name: "Sal Albanese",
+        search_terms: ["#albanese", "@salalbanese2013"]
+      }
+    ]
+  },
+  {
+    office: 'comptroller',
+    candidates: [
+      {
+        name: "Scott Stringer",
+        search_terms: ["@stringer2013", "#stringer", "@scottmstringer"]
+      },
+      {
+        name: "Eliot Spitzer",
+        search_terms: ["@spitzer2013", "#spitzer"]
+      }
+    ]
+  },
+  {
+    office: 'public_advocate',
+    candidates: [
+      {
+        name: "Reshma Saujani",
+        search_terms: ["@reshmasaujani", "#saujani", "saujani"]
+      },
+      {
+        name: "Daniel Squadron",
+        search_terms: ["@squadron4NY", "@danielsquadron", "#squadron"]
 
-var mayor_race_name = ["Christine Quinn", "Bill de Blasio","Bill Thompson", "Anthony Weiner", "John Liu", "Sal Albanese"];
-var comptroller_race_name = ["Scott Stringer", "Eliot Spitzer"];
-var public_advocate_race_name = ["Reshma Saujani", "Daniel Squadron", "Letitia James"];
-var manhatten_president_race_name = ["Gale Brewer", "Julie Menin", "Jessica Lappin", "Robert Jackson"];
-var queens_president_race_name = ["Melinda Katz", "Peter Vallone"];
-var brooklyn_da_race_name = ["Charles J. Hynes", "Ken Thompson"];
-var repub_mayor_primary_race_name = ["Joe Lhota", "John Catsimatidis", "George McDonald"];
+      },
+      {
+        name: "Letitia James",
+        search_terms: ["@tish2013", "@tishjames", " #teamtish", "#tish"]
+      }
+    ]
+  },
+  {
+    office: 'manhattan_president',
+    candidates: [
+      {
+        name: "Gale Brewer",
+        search_terms: ["@galeforMBP", "@galeabrewer", "#gale", "#galebrewer", "#brewer"]
+      },
+      {
+        name: "Julie Menin",
+        search_terms: ["@juliemenin", "#menin", "menin"]
+      },
+      {
+        name: "Jessica Lappin",
+        search_terms: ["@jesslappin", "#lappin", "lappin"]
+      },
+      {
+        name: "Robert Jackson",
+        search_terms: ["@RJackson_NYC", "#jackson"]
+      }
+    ]
+  },
+  {
+    office: 'queens_president',
+    candidates: [
+      {
+        name: "Melinda Katz",
+        search_terms: ["@melindakatz", "#katz"]
+      },
+      {
+        name: "Peter Vallone",
+        search_terms: ["@pfvjr", "#vallone"]
+      }
+    ]
+  },
+  {
+    office: 'brooklyn_da',
+    candidates: [
+      {
+        name: "Charles J. Hynes",
+        search_terms: ["@hynesforda", "#hynes", "@brooklynda"]
+      },
+      {
+        name: "Ken Thompson",
+        search_terms: ["@KenThompson4DA", "#kenthompson"]
+      }
+    ]
+  },
+  {
+    office: 'repub_mayor_primary',
+    candidates: [
+      {
+        name: "Joe Lhota",
+        search_terms: ["@joelhota", "@joelhota4mayor"]
+      },
+      {
+        name: "John Catsimatidis",
+        search_terms: ["@jcats2013"]
+      },
+      {
+        name: "George McDonald",
+        search_terms: ["@mcdonald4nyc"]
+      }
+    ]
+  }
+]
 
 var geoJson = [];
 
@@ -190,11 +300,11 @@ var data_pulse_prop = function(deviation, scale_function, pulse_function) {
 L.Map.include(MapCenterOffsetMixin);
 
 
-var getDotColor = function(current_race, text) {
+var getDotColor = function(race, text) {
   var color = '';
-  current_race.some(function(r, i){
-    return r.some(function(name){
-      if (~(text.indexOf(name))) {
+  race.candidates.some(function(c, i){
+    return c.search_terms.some(function(term){
+      if (~(text.indexOf(term))) {
         color = "static/dots/" + colors[i] + "_dot.png"
         return true;
       }
@@ -247,17 +357,16 @@ var getFSQGeoPoint = function(evt, url) {
 
 
 /* Fetch Data, create geo features */
-function fetch_data(current_race, race_name, names_in_race) {
-
-  d3.json('static/'+ race_name + '_2.json', function(error,json) {
+function fetch_data(race) {
+  d3.json('static/'+ race.office + '_race_2.json', function(error,json) {
     geoJson = json.map(function(evt) {
-      var geoPoint, url = "";
+      var geoPoint, icon_url = "";
       if (evt.mid_lng == null) { //this is a tweet
-        url = getDotColor(current_race, evt.text) || "static/dots/orange_dot.png";
-        geoPoint = getTweetGeoPoint(evt, url);
+        icon_url = getDotColor(race, evt.text) || "static/dots/orange_dot.png";
+        geoPoint = getTweetGeoPoint(evt, icon_url);
       } else {
-        url = getDotColor(current_race, evt.caption.text) || "static/dots/orange_dot.png";
-        geoPoint = getFSQGeoPoint(evt, url);
+        icon_url = getDotColor(race, evt.caption.text) || "static/dots/orange_dot.png";
+        geoPoint = getFSQGeoPoint(evt, icon_url);
       }
       return geoPoint;
     });
@@ -317,56 +426,52 @@ function fetch_data(current_race, race_name, names_in_race) {
   });
 }
 
-function update(race, race_name, names_in_race){
-  debugger
+var getRaceData = function(race_name) {
+  var result;
+  races.some(function(race) {
+    if (race.office === race_name){
+      result = race;
+      return true;
+    }
+  })
+  return result;
+}
+
+var update = function(race_name) {
+  var race = getRaceData(race_name);
+  update_banner(race)
   geoJson = [];
   map.markerLayer.setGeoJSON(geoJson);
-  fetch_data(race, race_name, names_in_race)
-
-  // race.forEach(function(candidate){
-  //   fetch_data(candidate, race);
-  // })
+  fetch_data(race);
 }
 
-function banner(race, race_name){
+var update_banner = function(race){
   $("#banner").children().remove();
 
-  var length = race.length;
-  var width = ($(window).width()/length) - 40;
+  var width = $(window).width() / race.candidates.length - 40;
 
-  race.forEach(function(candidate_arr, i){
-    var color = colors[race.indexOf(candidate_arr)];
-    var candidate = candidate_arr[0].substring(1);
+  race.candidates.forEach(function(candidate, i){
+    var color = colors[i];
+    var twitter_handle = candidate.search_terms[0].substring(1);
 
-    $("#banner").append("<li class='candidate " + candidate + "' style='width: " + width + "'></li>");
-    $("." + candidate).append("<div class='"+ candidate +"_img img'></div>")
-    $("." + candidate + "_img").append("<img src='/static/candidates/" + candidate + ".jpg'>");
-    $("." + candidate + "_img").append("<div class='color_banner' style='background-color:"+ color + "'>")
+    $("#banner").append("<li class='candidate " + twitter_handle + "' style='width: " + width + "'></li>");
+    $("." + twitter_handle).append("<div class='"+ twitter_handle +"_img img'></div>")
+    $("." + twitter_handle + "_img").append("<img src='/static/candidates/" + twitter_handle + ".jpg'>" +
+                                       "<div class='color_banner' style='background-color:"+ color + "'>")
 
 
-    $("." + candidate).append("<div class='" + candidate + "_text text_half'></div>");
-    $("." + candidate + "_text").append("<text>" + race_name[i] + "</text>");
-    $("." + candidate + "_text").append("<div class='stat_box'></div>");
+    $("." + twitter_handle).append("<div class='" + twitter_handle + "_text text_half'></div>");
+    $("." + twitter_handle + "_text").append("<text>" + candidate.name + "</text>" +
+                                        "<div class='stat_box'></div>");
   });
-}
-
-function change_race(race, race_name, name_of_race){
-  banner(race, race_name);
-  update(race, name_of_race, race_name);
 }
 
 // JQuery for UI
 
 $(document).ready(function () {
-    $("#races").on('change', function(d) {
-      var race = $(this).find('option:selected').attr("value");
-      change_race(eval(race), eval(race + "_name"), race);
-    });
+  $("#races").on('change', function(d) {
+    var race_name = $(this).find('option:selected').attr("value");
+    update(race_name);
+  });
 });
-
-// End JQuery for UI
-
-banner(mayor_race, mayor_race_name);
-update(mayor_race, "mayor_race", mayor_race_name);
-
-
+update('mayor');
