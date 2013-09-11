@@ -334,7 +334,7 @@ var getTweetGeoPoint = function(evt, url) {
   };
 };
 
-var getFSQGeoPoint = function(evt, url) {
+var getInstGeoPoint = function(evt, url) {
   return {
     type: 'Feature',
     geometry: {
@@ -366,7 +366,7 @@ function fetch_data(race) {
         geoPoint = getTweetGeoPoint(evt, icon_url);
       } else {
         icon_url = getDotColor(race, evt.caption.text) || "static/dots/orange_dot.png";
-        geoPoint = getFSQGeoPoint(evt, icon_url);
+        geoPoint = getInstGeoPoint(evt, icon_url);
       }
       return geoPoint;
     });
@@ -428,12 +428,13 @@ function fetch_data(race) {
 
   race.candidates.forEach(function(candidate) {
     candidate.latestTweets = [];
-    var q = candidate.search_terms.join(',');
-    var url = "https://api.twitter.com/1.1/search/tweets.json?q=" + q +"&count=10";
-    $.getJSON(url, function(data) {
-      debugger
-      candidate.latestTweets = data;
-    });
+    var q = candidate.search_terms.map(function(term) {
+      return term.replace(/^#|@/, '');
+    }).join(',');
+    var url = "https://api.twitter.com/1.1/search/tweets.json?q=" + "bill" + "&count=10";
+    // $.getJSON(url + "&callback=?", function(data) {
+    //   candidate.latestTweets = data;
+    // });
   });
 
   var tweetIndex = 0;
