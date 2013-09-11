@@ -424,6 +424,30 @@ function fetch_data(race) {
 
     map.markerLayer.setGeoJSON(geoJson);
   });
+
+
+  race.candidates.forEach(function(candidate) {
+    candidate.latestTweets = [];
+    var q = candidate.search_terms.join(',');
+    var url = "https://api.twitter.com/1.1/search/tweets.json?q=" + q +"&count=10";
+    $.getJSON(url, function(data) {
+      debugger
+      candidate.latestTweets = data;
+    });
+  });
+
+  var tweetIndex = 0;
+  setInterval(function() {
+    race.candidates.forEach(function(candidate) {
+      if (candidate.latestTweets.length === 0) return;
+
+      var twitter_handle = candidate.search_terms[0].substring(1);
+      var tweet = candidate.latestTweets[tweetIndex];
+      $("." + twitter_handle + "_text > .stat_box").text(tweet);
+    });
+    tweetIndex++;
+  }, 30 * 1000);
+
 }
 
 var getRaceData = function(race_name) {
