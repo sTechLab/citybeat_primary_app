@@ -1,83 +1,83 @@
 <html>
-	<head>
-		<title> CityBeat Primary App </title>
+  <head>
+    <title> CityBeat Primary App </title>
 
-		<!-- Styles -->
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-		 <script src='//api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.js'></script>
- 		 <script src='static/webticker.js'></script>
+    <!-- Styles -->
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+     <script src='//api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.js'></script>
+     <script src='static/webticker.js'></script>
 
-		<!-- CSS -->
-		<link href='http://api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.css' rel='stylesheet'/>
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-		<link href="static/app.css" rel="stylesheet"/>
+    <!-- CSS -->
+    <link href='http://api.tiles.mapbox.com/mapbox.js/v1.3.1/mapbox.css' rel='stylesheet'/>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link href="static/app.css" rel="stylesheet"/>
 
-	</head>
-	<body>
+  </head>
+  <body>
 
-	<div id="header">
-	      <div id="title-sec" class="column heading-main">
-	        <span id="title-city">Primary</span><span id="title-beat">Beat</span>
-	        <span id="title-second">Real Time Social Media Traker for NYC Primary Day</span>
-	      </div>
+  <div id="header">
+        <div id="title-sec" class="column heading-main">
+          <span id="title-city">Primary</span><span id="title-beat">Beat</span>
+          <span id="title-second">Real Time Social Media Traker for NYC Primary Day</span>
+        </div>
 
-	      <div class="right-header">
+        <div class="right-header">
 
-	        <div id="date-sec" class="column">
-	          <span id="date-day"></span>
-	          <span id="date"></span>
-	        </div>
+          <div id="date-sec" class="column">
+            <span id="date-day"></span>
+            <span id="date"></span>
+          </div>
 
-	        <div id="time-sec" class="column">
-	          <span id="time" class="heading-main"></span>
-	        </div>
-	      </div>
-	    </div>
+          <div id="time-sec" class="column">
+            <span id="time" class="heading-main"></span>
+          </div>
+        </div>
+      </div>
 
-	    <div id="top_colored_banner"></div>
-	    <div id="top_banner">
-	    	<span id="left_span">TWEETS AND PHOTOS FROM NYC PRIMARY DAY</span>
+      <div id="top_colored_banner"></div>
+      <div id="top_banner">
+        <span id="left_span">TWEETS AND PHOTOS FROM NYC PRIMARY DAY</span>
 
-	    	<a data-toggle="modal" href="#myModal"><span id="about">about</span></a>
+        <a data-toggle="modal" href="#myModal"><span id="about">about</span></a>
 
-	    	<span id="right_span">Currently Showing:
-	    		<select id="races">
-	    			<option value="mayor_race">Democratic Mayoral Primary</option> 
-	    			<option value="repub_mayor_primary_race">Republican Mayoral Primary</option> 
-	    			<option value="comptroller_race">Comptroller</option> 
-	    			<option value="public_advocate_race">Public Advocate</option> 
-	    			<option value="manhatten_president_race">Manhattan President</option> 
-	    			<option value="queens_president_race">Queens President</option> 
-	    			<option value="brooklyn_da_race">Brooklyn DA</option> 
+        <span id="right_span">Currently Showing:
+          <select id="races">
+            <option value="mayor">Democratic Mayoral Primary</option>
+            <option value="repub_mayor_primary">Republican Mayoral Primary</option>
+            <option value="comptroller">Comptroller</option>
+            <option value="public_advocate">Public Advocate</option>
+            <option value="manhattan_president">Manhattan President</option>
+            <option value="queens_president">Queens President</option>
+            <option value="brooklyn_da">Brooklyn DA</option>
 
-	    		</select>
-	    	</span>
-	    </div>
+          </select>
+        </span>
+      </div>
 
-			     <!-- Modal -->
-		  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-		    <div class="modal-dialog">
-		      <div class="modal-content">
-		        <div class="modal-body">
-		          ...
-		        </div>
-		      </div><!-- /.modal-content -->
-		    </div><!-- /.modal-dialog -->
-		  </div><!-- /.modal -->
+           <!-- Modal -->
+      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              ...
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
 
-	    <div id="colored_banner"></div>
-		<ul id="banner">
-		
-		</ul>
-		<div id="map"></div>
+      <div id="colored_banner"></div>
+    <ul id="banner">
 
-		<a href="http://brown.stanford.edu/"><img src="/static/brown.png" id="brown_image"></img></a>
-		<a href="http://www.thenewyorkworld.com/"><img src="/static/nyw.png" id="nyw_image"></img></a>
-		<a href="http://towcenter.org/"><img src="/static/tow.png" id="tow_image"></img></a>
+    </ul>
+    <div id="map"></div>
 
-		<script type="text/javascript" src="static/date.js"></script>
-		<script type="text/javascript" src="static/map.js"></script>
-	</body>
+    <a href="http://brown.stanford.edu/"><img src="/static/brown.png" id="brown_image"></img></a>
+    <a href="http://www.thenewyorkworld.com/"><img src="/static/nyw.png" id="nyw_image"></img></a>
+    <a href="http://towcenter.org/"><img src="/static/tow.png" id="tow_image"></img></a>
+
+    <script type="text/javascript" src="static/date.js"></script>
+    <script type="text/javascript" src="static/map.js"></script>
+  </body>
 </html>
