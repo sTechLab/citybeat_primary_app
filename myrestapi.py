@@ -11,7 +11,7 @@ from bson.objectid import ObjectId
 connection = Connection('grande.rutgers.edu', 27017)
 db = connection['citybeat_production']
 
-mayor_race = [["@Quinn4NY", "@ChrisCQuinn", "#quinn"], ["@BilldeBlasio", "@deblasionyc", "blasio", "#TeamdeBlasio", "#deblasio"],["@billthompsonnyc"], ["@anthonyweiner", "#anthonyweiner", "anthonyweiner"], ["@johncliu", "@JohnLiu2013", "#liu"], ["#albanese", "@salalbanese2013"]]
+mayor_race = [["@Quinn4NY", "@ChrisCQuinn", "#quinn", "#votequinn"], ["@BilldeBlasio", "@deblasionyc", "blasio", "#TeamdeBlasio", "#deblasio"],["@billthompsonnyc"], ["@anthonyweiner", "#anthonyweiner", "anthonyweiner"], ["@johncliu", "@JohnLiu2013", "#liu"], ["#albanese", "@salalbanese2013"]]
 comptroller_race = [["@stringer2013", "#stringer", "@scottmstringer"], ["@spitzer2013", "#spitzer"]];
 public_advocate_race = [["@reshmasaujani", "#saujani", "saujani"], ["@squadron4NY", "@danielsquadron"], ["@tish2013", "@tishjames", " #teamtish", "#tish"]];
 manhatten_president_race = [["@galeforMBP", "@galeabrewer", "#gale", "#galebrewer"], ["@juliemenin", "#menin", "menin"], ["@jesslappin", "#lappin", "lappin"], ["@RJackson_NYC"]];
@@ -29,7 +29,8 @@ def get_document(list_name, ids):
         open("static/" + list_name + "_updating_2.json", 'w').close()
         f = open("static/" + list_name + "_updating_2.json", "w")
 
-        timestamp = str(round(int(time.time()), 0) - 3600)
+        timestamp = str(round(int(time.time()), 0) - 259200)
+        print timestamp
         timestamp = timestamp.replace(' ', '')[:-2].upper()
         print timestamp
 
@@ -39,7 +40,7 @@ def get_document(list_name, ids):
             print id
             for tag in id:
                 print tag
-                for post in db['tweets'].find({'text': {'$regex': '.*' + tag + '', '$options':'-i'}}):
+                for post in db['tweets'].find({'text': {'$regex': '.*' + tag + '', '$options':'-i'}, 'created_time': {'$gte': timestamp}}):
                     entities.append(json.dumps(post))
                     entities.append(",")
                     print post
